@@ -1,0 +1,177 @@
+version: '3.3'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: docker/accounts/Dockerfile
+    working_dir: /home/max/software/projects/Bank-DDD-CQRS-ES
+    command: gunicorn --bind 0.0.0.0:4000 --worker-class=gevent --worker-connections=1000 --workers=3 bank_ddd_es_cqrs.server:app
+    volumes:
+      - ./:/usr/src/app/
+    ports:
+      - 4000:4000
+    depends_on:
+    - db
+    env_file:
+      - .env.docker.dev
+
+  db:
+    image: postgres:12
+    volumes:
+      - ./docker/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./data/postgres/:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123456789
+      - POSTGRES_DB=postgres
+    ports:
+      - 5432:5432
+    command:
+      - "postgres"
+      - "-c"
+      - "wal_level=logical"
+      - "-c"
+      - "max_wal_senders=1"
+      - "-c"
+      - "max_replication_slots=1"
+
+  zookeeper-1:
+    image: confluentinc/cp-zookeeper:5.5.1
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 22181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: localhost:22888:23888;localhost:32888:33888;localhost:42888:43888
+
+      # This is so that we will be able to execute commands inside the container of the zookeeper
+      KAFKA_OPTS: "-Dzookeeper.4lw.commands.whitelist=*"
+    network_mode: host
+    ports:
+      - 22181:22181
+    volumes:
+      - ./data/zookeeper/1/data/:/var/lib/zookeeper/data
+      - ./data/zookeeper/1/log/:/var/lib/zookeeper/log
+
+  zookeeper-2:
+    image: confluentinc/cp-zookeeper:5.5.1
+    environment:
+      ZOOKEEPER_SERVER_ID: 2
+      ZOOKEEPER_CLIENT_PORT: 32181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: localhost:22888:23888;localhost:32888:33888;localhost:42888:43888
+
+      # This is so that we will be able to execute commands inside the container of the zookeeper
+      KAFKA_OPTS: "-Dzookeeper.4lw.commands.whitelist=*"
+    network_mode: host
+    ports:
+      - 32181:32181
+    volumes:
+      - ./data/zookeeper/2/data/:/var/lib/zookeeper/data
+      - ./data/zookeeper/2/log/:/var/lib/zookeeper/log
+
+  zookeeper-3:
+    image: confluentinc/cp-zookeeper:5.5.1
+    environment:
+      ZOOKEEPER_SERVER_ID: 3
+      ZOOKEEPER_CLIENT_PORT: 42181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: localhost:22888:23888;localhost:32888:33888;localhost:42888:43888
+
+      # This is so that we will be able to execute commands inside the container of the zookeeper
+      KAFKA_OPTS: "-Dzookeeper.4lw.commands.whitelist=*"
+    network_mode: host
+    ports:
+      - 42181:42181
+    volumes:
+      - ./data/zookeeper/3/data/:/var/lib/zookeeper/data
+      - ./data/zookeeper/3/log/:/var/lib/zookeeper/log
+
+  kafka-1:
+    image: confluentinc/cp-kafka:5.5.1
+    network_mode: host
+    volumes:
+      - ./data/kafka/1/:/var/lib/kafka/data
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    environment:
+      KAFKA_DELETE_TOPIC_ENABLE: "true"
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: localhost:22181,localhost:32181,localhost:42181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:19092
+    ports:
+      - 19092:19092
+
+  kafka-2:
+    image: confluentinc/cp-kafka:5.5.1
+    network_mode: host
+    volumes:
+      - ./data/kafka/2/:/var/lib/kafka/data
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    environment:
+      KAFKA_DELETE_TOPIC_ENABLE: "true"
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: localhost:22181,localhost:32181,localhost:42181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:29092
+    ports:
+      - 29092:29092
+
+  kafka-3:
+    image: confluentinc/cp-kafka:5.5.1
+    network_mode: host
+    volumes:
+      - ./data/kafka/3/:/var/lib/kafka/data
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    environment:
+      KAFKA_DELETE_TOPIC_ENABLE: "true"
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: localhost:22181,localhost:32181,localhost:42181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:39092
+    ports:
+      - 39092:39092
+
+  kafka-connect:
+    build:
+      context: .
+      dockerfile: docker/kafka-connect/Dockerfile
+    working_dir: /home/max/software/projects/Bank-DDD-CQRS-ES
+    network_mode: host
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+      - kafka-1
+      - kafka-2
+      - kafka-3
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: localhost:19092,localhost:29092,localhost:39092
+      CONNECT_REST_PORT: 8083
+      CONNECT_GROUP_ID: "accounts"
+      CONNECT_CONFIG_STORAGE_TOPIC: "accounts-config"
+      CONNECT_OFFSET_STORAGE_TOPIC: "accounts-offsets"
+      CONNECT_STATUS_STORAGE_TOPIC: "accounts-status"
+      CONNECT_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_REST_ADVERTISED_HOST_NAME: "localhost"
+      CONNECT_PLUGIN_PATH: /kafka/plugins
+    ports:
+      - 8083:8083
+    volumes:
+      - ./data/connect/quickstart/file/:/tmp/quickstart
+      - ./data/connect/quickstart/jars:/etc/kafka-connect/jars

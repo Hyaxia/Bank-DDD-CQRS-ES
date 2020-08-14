@@ -1,0 +1,10 @@
+from enum import Enum
+
+
+class StatusCodes(Enum):
+    CREATED = 201
+    NOT_FOUND = 404
+    INVALID_USER_DATA = 422
+    INVALID_REQUEST = 400
+    INTERNAL_SERVER_ERROR = 500
+    CONFLICT_WITH_CURRENT_STATE = 409
