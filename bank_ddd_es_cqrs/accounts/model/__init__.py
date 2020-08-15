@@ -6,4 +6,4 @@ from .first_last_name import FirstName, LastName
 from .birthdate import Birthdate
 from .social_security_number import SocialSecurityNumber
 from .client import Client
-from .repo import AccountWriteRepository, ClientWriteRepository, WriteRepository
+from .repo import AccountWriteRepository, ClientWriteRepository
