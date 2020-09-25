@@ -28,6 +28,7 @@ How To Run?
 Docker is required to run this project.
 
 - Clone the project and enter the cloned directory
+- Change absolute path in `docker-compose.yaml` in web and kafka-connect services to the path of the project
 - Run `docker-compose build`
 - Run `docker-compose up -d`
 - Wait for kafka-connect to finish initialization (you can check it by `docker-compose ps` and see its status, its supposeto be `healthy`)
@@ -69,6 +70,7 @@ This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypack
 
 TODOs
 -----
+- Change `docker-compose.yaml` so it does not use absolute path
 - Add read side to the project
 - Add different restrictions to the aggregates that showcase how to perform validation in ES + CQRS
 - Add leftover tests
