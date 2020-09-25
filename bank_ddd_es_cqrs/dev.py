@@ -1,6 +1,3 @@
-# TODO: Find out why the init script for the post request is not recognized (not found)
-#   inside the container of kafka-connect
-
 import os
 import sys
 import inspect

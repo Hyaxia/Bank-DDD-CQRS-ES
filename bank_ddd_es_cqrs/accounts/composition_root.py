@@ -19,4 +19,7 @@ def get_client_write_repo() -> ESClientRepository:
 
 
 event_manager = PyDispatcherEventManager()
-start_kafka_consumer(event_manager.publish, os.environ['ACCOUNTS_KAFKA_CONN_STRING'], os.environ['ACCOUNTS_KAFKA_CDC_TOPIC'], os.environ['ACCOUNTS_KAFKA_CONSUMER_GROUP_ID'])
+
+
+def start_event_consuming():
+    start_kafka_consumer(event_manager.publish, os.environ['ACCOUNTS_KAFKA_CONN_STRING'], os.environ['ACCOUNTS_KAFKA_CDC_TOPIC'], os.environ['ACCOUNTS_KAFKA_CONSUMER_GROUP_ID'])

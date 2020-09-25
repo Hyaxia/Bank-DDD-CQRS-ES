@@ -86,26 +86,26 @@ def test_set_maximum_debt_converts_dollars_and_cents_passed_to_amount(fake_accou
 
 
 def test_create_account_first_adds_account_created_to_uncommitted_changes(fake_account_repo):
-    create_account(UniqueID(), 'tes', UniqueID(), fake_account_repo, AmountDTO(90, 0))
+    create_account(UniqueID(), 'tes', UniqueID(), UniqueID(), fake_account_repo, AmountDTO(90, 0))
     account_called_with: Account = fake_account_repo.save.call_args.args[0]
     assert isinstance(account_called_with.uncommitted_changes[0], AccountCreated)
 
 
 def test_create_account_events_added_has_the_id_passed_to_the_function(fake_account_repo):
     new_account_client_id = UniqueID()
-    create_account(UniqueID(), 'tes', new_account_client_id, fake_account_repo, AmountDTO(90, 0))
+    create_account(UniqueID(), 'tes', UniqueID(), new_account_client_id, fake_account_repo, AmountDTO(90, 0))
     account_called_with: Account = fake_account_repo.save.call_args.args[0]
     created_event: AccountCreated = account_called_with.uncommitted_changes[0]
     assert created_event.client_id == new_account_client_id.value
 
 
 def test_create_account_adds_maximum_debt_changed_event_if_amount_specified(fake_account_repo):
-    create_account(UniqueID(), 'tes', UniqueID(), fake_account_repo, AmountDTO(25, 94))
+    create_account(UniqueID(), 'tes', UniqueID(), UniqueID(), fake_account_repo, AmountDTO(25, 94))
     account_called_with: Account = fake_account_repo.save.call_args.args[0]
     assert isinstance(account_called_with.uncommitted_changes[-1], AccountMaximumDebtChanged)
 
 
 def test_create_account_does_not_add_maximum_debt_changed_event_if_no_amount_is_specified(fake_account_repo):
-    create_account(UniqueID(), 'test', UniqueID(), fake_account_repo)
+    create_account(UniqueID(), 'test', UniqueID(), UniqueID(), fake_account_repo)
     account_called_with: Account = fake_account_repo.save.call_args.args[0]
     assert isinstance(account_called_with.uncommitted_changes[-1], AccountCreated)

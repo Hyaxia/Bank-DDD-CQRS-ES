@@ -16,9 +16,11 @@ Resources:
    In the read model, as the article advice, we will use an idempotency_id which is a combination of the operation_id and some other unique id
 """
 import os
+from bank_ddd_es_cqrs.accounts.composition_root import start_event_consuming
 from bank_ddd_es_cqrs.accounts.app import account_app_factory
 
 DB_STRING = f"postgres://{os.environ['ACCOUNTS_DB_USER']}:{os.environ['ACCOUNTS_DB_PASSWORD']}@{os.environ['ACCOUNTS_DB_HOST']}:" \
     f"{os.environ['ACCOUNTS_DB_PORT']}/{os.environ['ACCOUNTS_DB_NAME']}"
 
 app = account_app_factory(DB_STRING)
+start_event_consuming()
