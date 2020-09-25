@@ -1,6 +1,7 @@
 import os
 import sys
 import inspect
+from os.path import join, dirname
 
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
@@ -8,7 +9,9 @@ sys.path.insert(0, parentdir)
 
 from dotenv import load_dotenv
 
-load_dotenv(verbose=True, dotenv_path='/Users/maximvovshin/software/personal/Bank-DDD-CQRS-ES/.env.local.dev')
+dotenv_path = join(dirname(__file__), '../.env.local.dev')
+
+load_dotenv(verbose=True, dotenv_path=dotenv_path)
 
 from bank_ddd_es_cqrs.server import app
 from bank_ddd_es_cqrs.accounts.infrastructure import event_store_db

@@ -5,7 +5,6 @@ services:
     build:
       context: .
       dockerfile: docker/accounts/Dockerfile
-    working_dir: /home/max/software/projects/Bank-DDD-CQRS-ES
     command: gunicorn --bind 0.0.0.0:4000 --worker-class=gevent --worker-connections=1000 --workers=3 bank_ddd_es_cqrs.server:app
     volumes:
       - ./:/usr/src/app/
@@ -150,7 +149,6 @@ services:
     build:
       context: .
       dockerfile: docker/kafka-connect/Dockerfile
-    working_dir: /home/max/software/projects/Bank-DDD-CQRS-ES
     depends_on:
       - zookeeper-1
       - zookeeper-2

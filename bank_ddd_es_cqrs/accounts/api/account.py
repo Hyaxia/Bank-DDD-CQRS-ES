@@ -12,16 +12,6 @@ account_ns = Namespace('Account', description='Account related operations')
 
 
 class AccountBalance(Resource):
-    @account_ns.doc(
-        responses={200: 'Balance change command has been successfully committed',
-                   500: 'Interval Server Error'}
-    )
-    def get(self, account_id):
-        """
-        Get the balance of the account
-        """
-        pass
-
     @account_ns.expect(account_balance_parser)
     @account_ns.doc(
         responses={200: 'Balance change command has been successfully committed',
