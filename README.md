@@ -41,7 +41,7 @@ Docker is required to run this project.
     "name": "postgres-accounts",
     "config": {
         "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
-        "database.hostname": "localhost",
+        "database.hostname": "db",
         "database.port": "5432",
         "database.user": "postgres",
         "database.password": "123456789",
@@ -50,7 +50,7 @@ Docker is required to run this project.
         "table.whitelist": "public.events",
         "tasks.max": "1",
         "plugin.name": "pgoutput",
-        "database.history.kafka.bootstrap.servers": "localhost:19092,localhost:29092,localhost:39092",
+        "database.history.kafka.bootstrap.servers": "kafka-1:19092,kafka-2:29092,kafka-3:39092",
         "database.history.kafka.topic": "schema-changes.accounts"
     }
 }
