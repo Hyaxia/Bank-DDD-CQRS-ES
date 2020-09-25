@@ -1,4 +1,4 @@
-Bank DDD ES CQRS - WIP
+Bank DDD ES CQRS
 ================
 
 An example project of using ES + CQRS while using the DDD approach and clean architecture
@@ -63,3 +63,9 @@ This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypack
 
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
 .. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
+
+TODOs
+-----
+- Add read side to the project
+- Add different restrictions to the aggregates that showcase how to perform validation in ES + CQRS
+- Add leftover tests
