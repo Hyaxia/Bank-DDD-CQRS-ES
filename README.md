@@ -35,6 +35,7 @@ Docker is required to run this project.
 - Perform a REST request to the kafka connect instance we have to create the debezium connector that will query the events table:
     - url to post the request to is the url of the kafka connect rest api - `http://localhost:8083/connectors`
     - data is as follows:
+
 ```
 {
     "name": "postgres-accounts",
