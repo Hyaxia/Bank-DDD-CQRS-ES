@@ -55,6 +55,9 @@ Docker is required to run this project.
 }
 ```
 
+- Go to localhost:4000 and perform use the swagger api to perform the calls to see how it works.
+
+** The aggregate id's are in listed in the `location` header.
 
 Credits
 -------
